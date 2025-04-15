@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car's Brand Classifier</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            color: #4b5563;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 2px dashed #3b82f6;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            background-color: #f0f7ff;
+        }
+
+        .upload-area.dragover {
+            background-color: #e0f2ff;
+            border-color: #1e3a8a;
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 20px;
+            display: none;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+
+        button {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #1e3a8a;
+        }
+
+        button:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .output-area {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            min-height: 50px;
+            background-color: #f8fafc;
+        }
+
+        .status {
+            margin-top: 10px;
+            color: #4b5563;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Car's Brand Classifier</h1>
+        <p class="description">Upload an image of a car to identify its brand</p>
+        
+        <div class="upload-area" id="dropZone">
+            <p>Drag and drop an image here or click to select</p>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+            <img id="imagePreview" alt="Preview">
+        </div>
+
+        <button id="classifyBtn" disabled>Classify</button>
+        
+        <div class="output-area" id="outputArea">
+            <p>Result will appear here</p>
+        </div>
+        
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const classifyBtn = document.getElementById('classifyBtn');
+        const outputArea = document.getElementById('outputArea');
+
+        // Handle drag and drop events
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleFile(file);
+            }
+        });
+
+        // Handle click to select file
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        });
+
+        function handleFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+                classifyBtn.disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Handle classification
+        classifyBtn.addEventListener('click', async () => {
+            if (!imagePreview.src) return;
+
+            classifyBtn.disabled = true;
+            outputArea.innerHTML = '<p>Classifying...</p>';
+
+            try {
+                const response = await fetch('http://localhost:2005/classify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        image: imagePreview.src.split(',')[1] // Remove the data:image/... prefix
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Server error');
+                }
+
+                const result = await response.text();
+                outputArea.innerHTML = `<p>Brand: ${result}</p>`;
+            } catch (error) {
+                outputArea.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            } finally {
+                classifyBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
