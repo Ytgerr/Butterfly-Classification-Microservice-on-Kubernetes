@@ -2,6 +2,7 @@ import base64
 import fastapi
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.concurrency import run_in_threadpool
 from image_classifier import classify_image
 
 app = fastapi.FastAPI()
@@ -17,9 +18,9 @@ app.add_middleware(
 
 
 @app.post("/classify")
-def read_root(image: dict):
+async def read_root(image: dict):
     image_bytes = base64.b64decode(image["image"])
-    brand, confidence = classify_image(image_bytes)
+    brand, confidence = await run_in_threadpool(classify_image, image_bytes)
     return {"brand": brand, "confidence": confidence}
 
 
