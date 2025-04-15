@@ -19,10 +19,9 @@ app.add_middleware(
 @app.post("/classify")
 def read_root(image: dict):
     image_bytes = base64.b64decode(image["image"])
-    print(image_bytes)
-
-    return {"response": classify_image(image_bytes)}
+    brand, confidence = classify_image(image_bytes)
+    return {"brand": brand, "confidence": confidence}
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=2005)
+    uvicorn.run(app, host="localhost", port=2005)

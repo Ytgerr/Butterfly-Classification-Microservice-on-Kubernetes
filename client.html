@@ -89,11 +89,81 @@
 
         .output-area {
             margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            min-height: 50px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            min-height: 80px;
             background-color: #f8fafc;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .output-area.loading {
+            border-color: #3b82f6;
+            background-color: #f0f7ff;
+        }
+
+        .output-area.success {
+            border-color: #10b981;
+        }
+
+        .output-area.error {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+
+        .result-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+            text-align: center;
+        }
+
+        .result-text.success {
+            color: #10b981;
+        }
+
+        .result-text.error {
+            color: #ef4444;
+        }
+
+        .confidence {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(to right, #dc2626, #f59e0b, #10b981);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .confidence-indicator {
+            height: 100%;
+            background-color: white;
+            transition: width 0.3s ease;
+        }
+
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .status {
@@ -118,7 +188,7 @@
         <button id="classifyBtn" disabled>Classify</button>
         
         <div class="output-area" id="outputArea">
-            <p>Result will appear here</p>
+            <p class="result-text">Upload an image to get started</p>
         </div>
         
     </div>
@@ -176,7 +246,11 @@
             if (!imagePreview.src) return;
 
             classifyBtn.disabled = true;
-            outputArea.innerHTML = '<p>Classifying...</p>';
+            outputArea.innerHTML = `
+                <div class="loading-spinner"></div>
+                <p class="result-text">Analyzing image...</p>
+            `;
+            outputArea.className = 'output-area loading';
 
             try {
                 const response = await fetch('http://localhost:2005/classify', {
@@ -185,7 +259,7 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        image: imagePreview.src.split(',')[1] // Remove the data:image/... prefix
+                        image: imagePreview.src.split(',')[1]
                     })
                 });
 
@@ -194,9 +268,29 @@
                 }
 
                 const result = await response.text();
-                outputArea.innerHTML = `<p>Brand: ${result}</p>`;
+                const data = JSON.parse(result);
+                const confidence = data.confidence * 100;
+                let hue;
+                if (confidence < 85) {
+                    hue = (confidence / 85) * 40; // 0 (red) to 40 (orange) for 0-85%
+                } else {
+                    hue = 120; // lime green for 85-100%
+                }
+                const backgroundColor = `hsl(${hue}, 90%, 95%)`;
+                const borderColor = `hsl(${hue}, 90%, 50%)`;
+                
+                outputArea.innerHTML = `
+                    <p class="result-text success">Brand: ${data.brand}</p>
+                    <p class="confidence">Confidence: ${confidence.toFixed(1)}%</p>
+                `;
+                outputArea.className = 'output-area success';
+                outputArea.style.backgroundColor = backgroundColor;
+                outputArea.style.borderColor = borderColor;
             } catch (error) {
-                outputArea.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                outputArea.innerHTML = `
+                    <p class="result-text error">Error: ${error.message}</p>
+                `;
+                outputArea.className = 'output-area error';
             } finally {
                 classifyBtn.disabled = false;
             }

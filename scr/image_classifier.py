@@ -1,4 +1,4 @@
 
 
-def classify_image(image: bytes) -> str:
-    pass
+def classify_image(image: bytes) -> tuple[str, float]:
+    return "Hendai", 0.1
