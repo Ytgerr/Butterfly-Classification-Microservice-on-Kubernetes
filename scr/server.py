@@ -20,8 +20,8 @@ app.add_middleware(
 @app.post("/classify")
 async def read_root(image: dict):
     image_bytes = base64.b64decode(image["image"])
-    brand, confidence = await run_in_threadpool(classify_image, image_bytes)
-    return {"brand": brand, "confidence": confidence}
+    top_predicts = await run_in_threadpool(classify_image, image_bytes)
+    return {"Predicts": top_predicts}
 
 
 if __name__ == "__main__":
