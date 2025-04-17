@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Car's Brand Classifier</title>
+    <title>Butterfly Species Classifier</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -176,8 +176,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>Car's Brand Classifier</h1>
-        <p class="description">Upload an image of a car to identify its brand</p>
+        <h1>Butterfly Species Classifier</h1>
+        <p class="description">Upload an image of a butterfly to identify its species</p>
         
         <div class="upload-area" id="dropZone">
             <p>Drag and drop an image here or click to select</p>
@@ -267,9 +267,12 @@
                     throw new Error('Server error');
                 }
 
-                const result = await response.text();
-                const data = JSON.parse(result);
-                const confidence = data.confidence * 100;
+                const data = await response.json();
+                const topResult = data.Predicts[0];
+                const secondResult = data.Predicts[1];
+                const thirdResult = data.Predicts[2];
+
+                const confidence = topResult[1] * 100;
                 let hue;
                 if (confidence < 85) {
                     hue = (confidence / 85) * 40; // 0 (red) to 40 (orange) for 0-85%
@@ -278,10 +281,14 @@
                 }
                 const backgroundColor = `hsl(${hue}, 90%, 95%)`;
                 const borderColor = `hsl(${hue}, 90%, 50%)`;
-                
+
                 outputArea.innerHTML = `
-                    <p class="result-text success">Brand: ${data.brand}</p>
-                    <p class="confidence">Confidence: ${confidence.toFixed(1)}%</p>
+                    <p class="result-text success" style="color: ${borderColor};">${topResult[0]}</p>
+                    <p class="confidence" style="color: ${borderColor};">Confidence: ${confidence.toFixed(1)}%</p>
+                    <div class="additional-results">
+                        <p class="result-text" style="font-size: 14px; color: gray;">${secondResult[0]} (${(secondResult[1] * 100).toFixed(1)}%)</p>
+                        <p class="result-text" style="font-size: 14px; color: gray;">${thirdResult[0]} (${(thirdResult[1] * 100).toFixed(1)}%)</p>
+                    </div>
                 `;
                 outputArea.className = 'output-area success';
                 outputArea.style.backgroundColor = backgroundColor;
