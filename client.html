@@ -19,13 +19,14 @@
 
         .container {
             background: linear-gradient(120deg, #f7ffe0 60%, #e0ffe6 100%);
-            padding: 32px 32px 40px 32px;
+            padding: 24px 24px 24px 24px;
             border-radius: 20px;
             box-shadow: 0 6px 16px rgba(34, 139, 34, 0.10);
             width: 85%;
             max-width: 620px;
             border: 2px solid #b6e2a1;
             position: relative;
+            animation: floatUpDown 3.5s ease-in-out infinite;
         }
 
         h1 {
@@ -106,11 +107,11 @@
         }
 
         .output-area {
-            margin-top: 20px;
-            padding: 22px 20px 18px 20px;
+            display: none;
+            margin-top: 16px;
+            padding: 16px 14px 12px 14px;
             border: 2.5px solid #7cb342;
             border-radius: 16px;
-            min-height: 80px;
             background: linear-gradient(120deg, #e0ffe6 60%, #f7ffe0 100%);
             transition: all 0.3s ease;
             display: flex;
@@ -118,6 +119,21 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 8px rgba(56, 142, 60, 0.10);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .output-area.visible {
+            display: flex !important;
+            animation: fadeSlideIn 0.7s cubic-bezier(.4,2,.6,1) 1;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes fadeSlideIn {
+            0% { opacity: 0; transform: translateY(30px); }
+            60% { opacity: 1; transform: translateY(-8px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         .output-area.loading {
@@ -216,13 +232,12 @@
         <div class="upload-area" id="dropZone">
             <p>Drag and drop an image here or click to select</p>
             <input type="file" id="fileInput" accept="image/*" style="display: none;">
-            <img id="imagePreview" alt="Preview">
+            <img id="imagePreview" alt="" style="display: none;">
         </div>
 
         <button id="classifyBtn" disabled>Classify</button>
         
         <div class="output-area" id="outputArea">
-            <p class="result-text">Upload an image to get started</p>
         </div>
         
     </div>
@@ -334,6 +349,11 @@
                 outputArea.className = 'output-area error';
             } finally {
                 classifyBtn.disabled = false;
+            }
+
+            // Show output area with animation on first classify
+            if (!outputArea.classList.contains('visible')) {
+                outputArea.classList.add('visible');
             }
         });
     </script>
