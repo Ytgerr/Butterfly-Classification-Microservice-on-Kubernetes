@@ -36,6 +36,6 @@ kind load docker-image butterfly-classifier:latest \
 4. Start deployment and service
 ```bash
 kubectl apply -f deployment/deployment.yaml
-kubectl apply -f deployment/deployment.yaml
+kubectl apply -f deployment/service.yaml
 ```
 5. Open `client.html` with browser.
