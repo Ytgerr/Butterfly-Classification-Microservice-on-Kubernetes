@@ -1,12 +1,25 @@
-FROM python:3.11
+# Use explicit Python version
+FROM python:3.11-slim
 
-WORKDIR /scr
+# Create and switch to a non-root user
+RUN useradd -m appuser && \
+    mkdir -p /app && \
+    chown appuser:appuser /app
+WORKDIR /app
+USER appuser
 
-COPY requirements.txt .
+# Install dependencies first (better layer caching)
+COPY --chown=appuser:appuser requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy application code
+COPY --chown=appuser:appuser model/ ./model
+COPY --chown=appuser:appuser src/ ./src
 
-COPY . .
+# Use environment variable for port
+ENV PORT=2005
+EXPOSE $PORT
 
-EXPOSE 2005
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "2005"]
+# Use exec form for CMD
+CMD ["python", "src/server.py"]

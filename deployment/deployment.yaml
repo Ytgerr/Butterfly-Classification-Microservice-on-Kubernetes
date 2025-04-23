@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: butterfly-classifier
+  labels:
+    app: butterfly-classifier
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: butterfly-classifier
+  template:
+    metadata:
+      labels:
+        app: butterfly-classifier
+    spec:
+      containers:
+      - name: butterfly-classifier
+        image: butterfly-classifier:latest
+        imagePullPolicy: Never  # Force use of local image
+        ports:
+        - containerPort: 2005

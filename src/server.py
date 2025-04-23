@@ -25,4 +25,4 @@ async def read_root(image: dict):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=2005)
+    uvicorn.run(app, host="0.0.0.0", port=2005)
