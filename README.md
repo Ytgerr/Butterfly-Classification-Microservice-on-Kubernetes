@@ -23,6 +23,7 @@ A web-based application that uses machine learning to classify butterfly species
 ```bash
 # by using chocolate
 choco install kind
+kind create cluster --config=kind/kind-config.yaml
 ```
 2. Build an image from Dockerfile
 ```bash
@@ -30,8 +31,7 @@ docker build -t butterfly-classifier .
 ```
 3. Load the image to kind cluster
 ```bash
-kind load docker-image butterfly-classifier:latest \
-    --config=kind/kind-config.yaml
+kind load docker-image butterfly-classifier:latest
 ```
 4. Start deployment and service
 ```bash
