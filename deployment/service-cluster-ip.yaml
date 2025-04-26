@@ -6,7 +6,6 @@ spec:
   selector:
     app: butterfly-classifier
   ports:
-    - port: 2005
+    - port: 80
       targetPort: 2005
-      nodePort: 32005
-  type: NodePort
+  type: ClusterIP
