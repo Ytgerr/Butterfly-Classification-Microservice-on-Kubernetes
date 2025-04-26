@@ -33,9 +33,18 @@ docker build -t butterfly-classifier .
 ```bash
 kind load docker-image butterfly-classifier:latest
 ```
-4. Start deployment and service
+4. Start Nginx Ingress Controller
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+```
+5. Edit `C:\Windows\System32\drivers\etc\hosts` and add this line:
+```bash
+127.0.0.1 api.butterfly.me
+```
+6. Start deployment and service
 ```bash
 kubectl apply -f deployment/deployment.yaml
-kubectl apply -f deployment/service.yaml
+kubectl apply -f deployment/service-cluster-ip.yaml
+kubectl apply -f deployment/service-ingress.yaml
 ```
-5. Open `client.html` with browser.
+7. Open `client.html` with browser.
