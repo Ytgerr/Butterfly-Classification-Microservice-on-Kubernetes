@@ -1,0 +1,24 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: butterfly-classifier-monitor
+  labels:
+    release: prometheus
+    app: butterfly-classifier
+spec:
+  selector:
+    matchLabels:
+      app: butterfly-classifier
+  endpoints:
+  - port: http-metrics
+    interval: 15s
+    path: /metrics/
+    scheme: http
+    scrapeTimeout: 10s
+    metricRelabelings:
+    - sourceLabels: [__name__]
+      regex: butterfly_classifier_.+
+      action: keep
+  namespaceSelector:
+    matchNames:
+    - default 
