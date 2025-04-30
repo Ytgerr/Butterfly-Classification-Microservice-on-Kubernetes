@@ -69,12 +69,12 @@ kubectl get hpa
 ## Testing
 To test work of this repo:
 ```bash
-curl -X POST -H "Content-Type: application/json" -d @post_data.txt http://localhost/classify
+curl -X POST -H "Content-Type: application/json" -d @tests/post_data.txt http://localhost/classify
 ```
 
 To test the load:
 ```bash
-ab -n 1000 -c 10 -p post_data.txt -T "application/json" http://localhost/classify
+ab -n 1000 -c 10 -p tests/post_data.txt -T "application/json" http://localhost/classify
 ```
 
 ## Monitoring
