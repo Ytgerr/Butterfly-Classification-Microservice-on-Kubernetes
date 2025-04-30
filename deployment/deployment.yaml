@@ -17,6 +17,12 @@ spec:
       containers:
       - name: butterfly-classifier
         image: butterfly-classifier:latest
-        imagePullPolicy: Never  # Force use of local image
+        imagePullPolicy: Never
         ports:
         - containerPort: 2005
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 2005
+          initialDelaySeconds: 5
+          periodSeconds: 10
