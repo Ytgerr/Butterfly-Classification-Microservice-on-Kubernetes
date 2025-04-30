@@ -4,7 +4,7 @@ from PIL import Image
 import io
 import json
 
-interpreter = tf.lite.Interpreter(model_path="model/model_quantized.tflite")
+interpreter = tf.lite.Interpreter(model_path="model/model_quantized_new.tflite")
 
 
 interpreter.allocate_tensors()
