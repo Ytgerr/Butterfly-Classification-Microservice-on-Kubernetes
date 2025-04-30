@@ -82,6 +82,8 @@ Port-forward Grafana:
 ```bash
 kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80
 ```
+user: admin
+password: prom-operator
 
 Port-forward Prometheus:
 ```bash
