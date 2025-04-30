@@ -6,7 +6,7 @@ from fastapi.concurrency import run_in_threadpool
 from image_classifier import classify_image
 from prometheus_client import Counter, Histogram, make_asgi_app
 import time
-from fastapi.responses import PlainTextResponse
+from fastapi import HTTPException
 
 app = fastapi.FastAPI()
 
@@ -56,7 +56,7 @@ async def read_root(image: dict):
     except Exception as e:
         # Record latency even for failed requests
         REQUEST_LATENCY.observe(time.time() - start_time)
-        raise e
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=2005)
