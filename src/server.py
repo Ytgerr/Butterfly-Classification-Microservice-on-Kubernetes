@@ -56,6 +56,7 @@ async def read_root(image: dict):
     except Exception as e:
         # Record latency even for failed requests
         REQUEST_LATENCY.observe(time.time() - start_time)
+        print(f"Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

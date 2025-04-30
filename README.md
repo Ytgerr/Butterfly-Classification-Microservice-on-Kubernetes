@@ -27,7 +27,7 @@ A web-based application that uses machine learning to classify butterfly species
 ### 2. Create Kind Cluster with Ingress Ports
 ```bash
 kind delete cluster
-kind create cluster --config kind-config.yaml
+kind create cluster --config kind/kind-config.yaml
 ```
 ### 3. Install Nginx Ingress for Kind
 ```bash
@@ -82,7 +82,7 @@ Port-forward Grafana:
 ```bash
 kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80
 ```
-user: admin
+user: admin \
 password: prom-operator
 
 Port-forward Prometheus:
